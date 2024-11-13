@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopEasy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="logo"></div>
+    <ul class="navigation">
+      <li><a href="#" class="active"><i class="fas fa-home"></i></a></li>
+      <li><a href="stocks.html"><i class="fas fa-box"></i></a></li>
+      <li><a href="map.html"><i class="fas fa-map"></i></a></li>
+      <li><a href="#"><i class="fas fa-cog"></i></a></li>
+      <li><a href="#"><i class="fas fa-user"></i></a></li>
+    </ul>
+  </aside>
+
+  <main class="content">
+    <section class="home-section">
+      <div class="background-image">
+        <div class="dim-overlay"></div>
+      </div>
+      <div class="widgets">
+        <div class="greeting-widget widget">
+          <div class="greeting-content">
+            <div class="greeting-text">
+              <h3>Hi, <span id="storeNamePlaceholder"></span>.</h3>
+              <p>Glad to see you! Let's keep your store stocked and shoppers smiling.<br><br>
+                “Growth begins when you embrace the tools that take you further.”</p>
+              <button id="logoutBtn">Sign Out</button>
+            </div>
+            <div class="greeting-image">
+              <img src="assets/rocket.png">
+            </div>
+          </div>
+        </div>
+
+        <div class="digital-clock-widget widget">
+          <div class="clock">
+            <h2 class="clock-display"></h2>
+          </div>
+        </div>
+
+        <div class="purchase-analytics-widget widget">
+          <h2 class="chart-title">Generated Revenue</h2>
+          <select id="revenueFilter" class="revenueSelect">
+            <option value="today">Today</option>
+            <option value="last3">Last 3 Days</option>
+            <option value="last7">Last 7 Days</option>
+            <option value="last30">Past Month</option>
+          </select>
+          <canvas id="revenueChart"></canvas>
+        </div>
+
+        <div class="app-usage-widget widget">
+          <h2 class="chart-title">App Usage</h2>
+          <canvas id="usageChart"></canvas>
+        </div>
+
+        <div class="digital-calendar-widget widget">
+          <div class="calendar">
+            <h2 class="calendar-title"></h2>
+            <div class="calendar-grid"></div>
+          </div>
+        </div>
+        <div></div>
+        <div></div>
+        <div class="items-widget widget">
+          <h2 class="chart-title">Most Purchased Items</h2>
+          <ul id="mostPurchasedItems"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.slim.js"></script>
+
+  
+  <script src="script/auth.js"></script>
+  <script src="script/clock.js"></script>
+  <script src="script/calendar.js"></script>
+  <script src="script/logout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // const firebaseConfig = {
+    //   apiKey: "AIzaSyDwGNnr89LQuf5X4T84vRUsFWRa5rAjU34",
+    //   authDomain: "shopeasy-00021.firebaseapp.com",
+    //   projectId: "shopeasy-00021",
+    //   storageBucket: "shopeasy-00021.appspot.com",
+    //   messagingSenderId: "571722682332",
+    //   appId: "1:571722682332:web:cea4a3cac463b0ad22c919",
+    //   measurementId: "G-MXGEGHRB7Q"
+    // };
+
+    // firebase.initializeApp(firebaseConfig);
+
+    const getDateDaysAgo = (days) => {
+      const date = new Date();
+      date.setDate(date.getDate() - days);
+      return date;
+    };
+
+    // Generated Revenue
+    const revenueFilter = document.getElementById('revenueFilter');
+    const revenueChartCtx = document.getElementById('revenueChart').getContext('2d');
+    let revenueChart;
+
+    function fetchRevenueData(userId) {
+      const filter = revenueFilter.value;
+      let startDate;
+      switch (filter) {
+        case 'today':
+          startDate = new Date();
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case 'last3':
+          startDate = getDateDaysAgo(3);
+          break;
+        case 'last7':
+          startDate = getDateDaysAgo(7);
+          break;
+        case 'last30':
+          startDate = getDateDaysAgo(30);
+          break;
+      }
+
+      const logsRef = firebase.database().ref(`grocery_stores/${userId}/logs`);
+      logsRef.once('value', (snapshot) => {
+        const logs = snapshot.val();
+        const filteredLogs = [];
+        let totalRevenue = 0;
+
+        for (const log in logs) {
+          const logDate = new Date(logs[log].date);
+          if (logDate >= startDate) {
+            const total = parseFloat(logs[log].total);
+            totalRevenue += total;
+            filteredLogs.push({ date: logDate, total });
+          }
+        }
+
+        const chartLabels = filteredLogs.map(log => log.date.toDateString());
+        const chartData = filteredLogs.map(log => log.total);
+
+        if (revenueChart) {
+          revenueChart.destroy();
+        }
+
+        revenueChart = new Chart(revenueChartCtx, {
+          type: 'bar',
+          data: {
+            labels: chartLabels,
+            datasets: [{
+              label: 'Revenue (₱)',
+              data: chartData,
+              backgroundColor: 'rgba(255, 152, 0, 0.8)',
+              borderColor: 'rgba(255, 152, 0, 1)',
+              borderWidth: 1,
+              borderRadius: 5,
+              barPercentage: 0.8,
+              categoryPercentage: 0.6,
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                labels: {
+                  font: {
+                    family: 'Oxanium',
+                    size: 14,
+                    weight: 'bold',
+                  },
+                  color: '#FFF',
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(20, 24, 40, 0.9)',
+                titleColor: '#FFF',
+                bodyColor: '#FFF',
+                cornerRadius: 4,
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Revenue (₱)',
+                  font: { family: 'Oxanium', size: 14, weight: 'bold' },
+                  color: '#FFF',
+                },
+                ticks: { color: '#FFF' },
+                grid: { color: 'rgba(255, 255, 255, 0.2)' }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Date',
+                  font: { family: 'Oxanium', size: 14, weight: 'bold' },
+                  color: '#FFF',
+                },
+                ticks: { color: '#FFF' },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      });
+    }
+
+    revenueFilter.addEventListener('change', () => {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) fetchRevenueData(user.uid);
+      });
+    });
+
+
+    //App Usage
+    const usageChartCtx = document.getElementById('usageChart').getContext('2d');
+    let usageChart;
+
+    const getWeekdayLabels = () => {
+      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const labels = [];
+      const today = new Date();
+
+      for (let i = 6; i >= 0; i--) {
+        const day = new Date(today);
+        day.setDate(today.getDate() - i);
+        labels.push(weekdays[day.getDay()]);
+      }
+
+      return labels;
+    };
+
+    function fetchUsageData(userId) {
+      const startDate = getDateDaysAgo(6);
+      const logsRef = firebase.database().ref(`grocery_stores/${userId}/logs`);
+
+      logsRef.once('value', (snapshot) => {
+        const logs = snapshot.val();
+        const checkoutCounts = Array(7).fill(0);
+
+        for (const log in logs) {
+          const logDate = new Date(logs[log].date);
+          if (logDate >= startDate) {
+            const daysAgo = Math.floor((new Date() - logDate) / (1000 * 60 * 60 * 24));
+            if (daysAgo >= 0 && daysAgo < 7) {
+              checkoutCounts[6 - daysAgo]++;
+            }
+          }
+        }
+
+        const chartLabels = getWeekdayLabels();
+
+        if (usageChart) {
+          usageChart.destroy();
+        }
+
+        usageChart = new Chart(usageChartCtx, {
+          type: 'line',
+          data: {
+            labels: chartLabels,
+            datasets: [{
+              label: 'Checkouts',
+              data: checkoutCounts,
+              backgroundColor: 'rgba(255, 152, 0, 0.3)',
+              borderColor: 'rgba(255, 152, 0, 1)',
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: '#FF9800',
+              pointBorderColor: '#FFF',
+              pointRadius: 5,
+              pointHoverRadius: 7,
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                labels: {
+                  font: {
+                    family: 'Oxanium',
+                    size: 14,
+                    weight: 'bold',
+                  },
+                  color: '#FFF',
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(20, 24, 40, 0.9)',
+                titleColor: '#FFF',
+                bodyColor: '#FFF',
+                cornerRadius: 4,
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Checkouts',
+                  font: { family: 'Oxanium', size: 14, weight: 'bold' },
+                  color: '#FFF',
+                },
+                ticks: { color: '#FFF' },
+                grid: { color: 'rgba(255, 255, 255, 0.2)' }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Days',
+                  font: { family: 'Oxanium', size: 14, weight: 'bold' },
+                  color: '#FFF',
+                },
+                ticks: { color: '#FFF' },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      });
+    }
+
+    // Most Purchased Items
+    function fetchMostPurchasedItems(userId) {
+      const logsRef = firebase.database().ref(`grocery_stores/${userId}/logs`);
+
+      logsRef.once('value', (snapshot) => {
+        const logs = snapshot.val();
+
+        if (!logs) {
+          console.error("No logs found!");
+          return;
+        }
+
+        const itemCounts = {};
+
+        for (const log in logs) {
+          const logEntry = logs[log];
+
+          if (logEntry.items && Array.isArray(logEntry.items)) {
+            logEntry.items.forEach(item => {
+              const itemName = item.productName;
+              if (itemName) {
+                itemCounts[itemName] = (itemCounts[itemName] || 0) + item.quantity;
+              }
+            });
+          } else {
+            console.warn(`Log entry ${log} does not have a valid 'items' field or it's not an array`);
+          }
+        }
+
+        const sortedItems = Object.entries(itemCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+
+        const itemsList = document.getElementById('mostPurchasedItems');
+        itemsList.innerHTML = '';
+
+        
+        const maxProductNameLength = 24;
+
+        sortedItems.forEach(([itemName, count], index) => {
+          const listItem = document.createElement('li');
+          listItem.className = `rank-${index + 1}`;
+
+          const rankIcon = index === 0 ? '👑 ' : '⭐ ';
+
+          const truncatedProductName = itemName.length > maxProductNameLength ? itemName.substring(0, maxProductNameLength) + '...' : itemName;
+
+          listItem.innerHTML = `
+        <span class="rank-icon">${rankIcon}</span>
+        <span class="product-name">${truncatedProductName}</span>
+        <span class="badge"><strong>${count}</strong> x</span>
+      `;
+
+          itemsList.appendChild(listItem);
+        });
+      });
+    }
+
+    //Update Greeting
+    function updateGreeting(userId) {
+      const storeRef = firebase.database().ref(`grocery_stores/${userId}/store_name`);
+
+      storeRef.once('value').then((snapshot) => {
+        const storeName = snapshot.val();
+        const greetingText = document.querySelector('.greeting-text h3');
+
+        if (storeName) {
+          greetingText.textContent = `Hi, ${storeName}.`;
+        } else {
+          greetingText.textContent = "Hi, Shopper.";
+        }
+      }).catch((error) => {
+        console.error("Error fetching store name:", error);
+      });
+    }
+
+
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        fetchRevenueData(user.uid);
+        fetchUsageData(user.uid);
+        fetchMostPurchasedItems(user.uid);
+        updateGreeting(user.uid);
+      } else {
+        console.log("User is not authenticated.");
+      }
+    });
+  </script>
+
+</body>
+
+</html>

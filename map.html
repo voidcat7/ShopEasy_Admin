@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopEasy | Map</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="logo"></div>
+        <ul class="navigation">
+            <li><a href="index.html"><i class="fas fa-home"></i></a></li>
+            <li><a href="stocks.html"><i class="fas fa-box"></i></a></li>
+            <li><a href="#" class="active"><i class="fas fa-map"></i></a></li>
+            <li><a href="#"><i class="fas fa-cog"></i></a></li>
+            <li><a href="#"><i class="fas fa-user"></i></a></li>
+        </ul>
+    </aside>
+
+    <main class="content">
+        <section class="home-section">
+            <div class="background-image">
+                <div class="dim-overlay"></div>
+            </div>
+        </section>
+
+        <div class="map-section">
+            <div class="file-upload-section">
+                <div id="map-status" class="map-status">
+                    <p id="existingMapText">Checking map status...</p>
+                    <p id="uploadedMapText" style="display:none;">Map file selected: <span id="mapFilename"></span></p>
+                </div>
+
+                <input type="file" id="map" class="file-input">
+                <label for="map" class="custom-file-input">Upload Map</label><br>
+                <button id="addMap">Add</button>
+                <button id="deleteMap">Delete</button>
+            </div>
+            <div class="file-upload-section">
+                <div id="img-status" class="img-status">
+                    <p id="existingImgText">Checking map image status...</p>
+                    <p id="uploadedImgText" style="display:none;">Map image selected: <span id="mapImgname"></span></p>
+                </div>
+
+                <input type="file" id="mapImage" class="file-input" accept="image/*">
+                <label for="mapImage" class="custom-file-input">Upload Image</label><br>
+                <button id="addImage">Add</button>
+                <button id="deleteImage">Delete</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwGNnr89LQuf5X4T84vRUsFWRa5rAjU34",
+            authDomain: "shopeasy-00021.firebaseapp.com",
+            projectId: "shopeasy-00021",
+            storageBucket: "shopeasy-00021.appspot.com",
+            messagingSenderId: "571722682332",
+            appId: "1:571722682332:web:cea4a3cac463b0ad22c919",
+            measurementId: "G-MXGEGHRB7Q"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        $(document).ready(function () {
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    // Check existing map status
+                    db.ref("grocery_stores/" + user.uid + "/map/map_file").once("value", (snapshot) => {
+                        if (snapshot.exists()) {
+                            $("#existingMapText").text("A map file is already uploaded.");
+                        } else {
+                            $("#existingMapText").text("No map file uploaded.");
+                        }
+                    }).catch((error) => {
+                        console.log("Error fetching map status:", error);
+                    });
+                    // Preview map file uploaded
+                    $("#map").change(function () {
+                        const file = document.getElementById('map').files[0];
+                        if (file) {
+                            $("#uploadedMapText").show();
+                            $("#mapFilename").text(file.name);
+                        } else {
+                            $("#uploadedMapText").hide();
+                        }
+                    });
+
+                    // Add map
+                    $("#addMap").click(function () {
+                        const file = document.getElementById('map').files[0];
+
+                        if (!file) {
+                            alert("Please select a file before uploading.");
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            try {
+                                const mapjson = event.target.result;
+                                db.ref("grocery_stores/" + user.uid + "/map/").set({
+                                    map_file: mapjson,
+                                })
+                                    .then(() => {
+                                        alert("Map file uploaded successfully!");
+                                        location.reload();
+                                    })
+                                    .catch((error) => {
+                                        console.log("Error uploading map:", error);
+                                    });
+                            } catch (e) {
+                                console.error("Error parsing JSON:", e);
+                                alert("Invalid JSON file");
+                            }
+                        };
+
+                        reader.readAsText(file);
+                    });
+
+                    // Delete map
+                    $("#deleteMap").click(function () {
+                        const mapRef = db.ref("grocery_stores/" + user.uid + "/map/map_file/");
+
+                        mapRef.once("value", (snapshot) => {
+                            if (snapshot.exists()) {
+                                mapRef.remove()
+                                    .then(() => {
+                                        alert("Map file deleted successfully!");
+                                        location.reload();
+                                    })
+                                    .catch((error) => {
+                                        console.log("Error deleting map:", error);
+                                    });
+                            } else {
+                                alert("No map file found.");
+                            }
+                        }).catch((error) => {
+                            console.log("Error checking map existence:", error);
+                        });
+                    });
+
+                    //Check existing image status
+                    db.ref("grocery_stores/" + user.uid + "/map/map_image").once("value", (snapshot) => {
+                        if (snapshot.exists()) {
+                            $("#existingImgText").text("A map image is already uploaded.");
+                        } else {
+                            $("#existingImgText").text("No map image uploaded.");
+                        }
+                    }).catch((error) => {
+                        console.log("Error fetching image status:", error);
+                    });
+                    
+                    //Preview image uploaded
+                    $("#mapImage").change(function () {
+                        const file = document.getElementById('mapImage').files[0];
+                        if (file) {
+                            $("#uploadedImgText").show();
+                            $("#mapImgname").text(file.name);
+                        } else {
+                            $("#uploadedImgText").hide();
+                        }
+                    });
+
+                    // Add image
+                    $("#addImage").click(function () {
+                        var imageFile = document.getElementById('mapImage').files[0];
+                        if (!imageFile) {
+                            alert("Please select an image file to upload.");
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            const imageBase64 = event.target.result;
+                            db.ref("grocery_stores/" + user.uid + "/map/").update({
+                                map_image: imageBase64
+                            })
+                                .then(() => {
+                                    alert("Image uploaded successfully!");
+                                    location.reload();
+                                })
+                                .catch((error) => {
+                                    console.log("Error uploading image:", error);
+                                });
+                        };
+
+                        reader.readAsDataURL(imageFile);
+                    });
+                    
+                    // Delete image
+                    $("#deleteImage").click(function () {
+                        const imgRef = db.ref("grocery_stores/" + user.uid + "/map/map_image/");
+
+                        imgRef.once("value", (snapshot) => {
+                            if (snapshot.exists()) {
+                                imgRef.remove()
+                                    .then(() => {
+                                        alert("Map image deleted successfully!");
+                                        location.reload();
+                                    })
+                                    .catch((error) => {
+                                        console.log("Error deleting map image:", error);
+                                    });
+                            } else {
+                                alert("No map image found.");
+                            }
+                        }).catch((error) => {
+                            console.log("Error checking map image existence:", error);
+                        });
+                        
+                    });
+
+                } else {
+                    alert("User is not authenticated. Please sign in.");
+                    window.location = "login.html";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+``

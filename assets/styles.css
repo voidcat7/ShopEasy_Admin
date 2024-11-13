@@ -1,0 +1,692 @@
+@font-face {
+  font-family: 'Oxanium';
+  src: url('Oxanium/Oxanium-VariableFont_wght.ttf') format('ttf'),
+}
+
+body {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Oxanium';
+}
+
+/*start of login styling*/
+.register-container,
+.login-container {
+  max-width: 400px;
+  margin: 100px auto;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+input[type="email"],
+input[type="password"] {
+  width: calc(100% - 22px);
+}
+
+input[type="email"],
+input[type="password"],
+button {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  width: 100%;
+  background-color: #ff8c00;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #ff8c00bf;
+}
+
+#google-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#google-login-btn:hover {
+  background-color: #f1f1f1;
+}
+
+#google-login-btn i {
+  width: 20px;
+  margin-right: 10px;
+}
+
+/*end of login styling*/
+
+
+/*start of home styling*/
+/*start of sidebar styling*/
+.sidebar {
+  width: 80px;
+  background-color: rgb(20, 24, 40, 0.5);
+  color: #fff;
+  height: 95vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 20px;
+  overflow-y: auto;
+  z-index: 1;
+  box-shadow: 0px 0px 15px black;
+  border-radius: 15px;
+}
+
+.logo {
+  margin: 20px 10px;
+  text-align: center;
+}
+
+.logo img {
+  max-width: 100%;
+  box-shadow: 0px 0px 2px white;
+}
+
+.navigation {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.navigation li {
+  margin-bottom: 10px;
+}
+
+.navigation a {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.navigation a:hover {
+  background-color: #ff8c00;
+  box-shadow: 0 0 10px #ff8c00;
+}
+
+.navigation i {
+  width: 15px;
+}
+
+.active {
+  background-color: #ff8c00;
+  box-shadow: 0 0 10px #ff8c00;
+}
+
+/*end of sidebar styling*/
+
+
+
+/*start of widgets styling*/
+.home-section {
+  position: relative;
+}
+
+.background-image {
+  background-image: url('wallpaper.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+}
+
+.dim-overlay {
+  background-color: rgb(0, 0, 0, .5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.widgets {
+  background-color: rgb(20, 24, 40, 0.5);
+  color: #fff;
+  height: 95vh;
+  width: 90%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 20px 120px;
+  box-shadow: 0px 0px 15px black;
+  border-radius: 15px;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 15px;
+}
+
+.widget {
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 0 2px black;
+  overflow: hidden;
+}
+
+.greeting-widget {
+  height: 250px;
+  margin: 40px 0 0 40px;
+  grid-column: span 2;
+  grid-row: span 1;
+  background-image: linear-gradient(to left, rgba(0, 0, 0, 0.9), rgb(4, 15, 50, 0.5));
+  box-shadow: none;
+  border: none;
+  overflow: visible;
+}
+
+.digital-clock-widget {
+  height: 40px;
+  margin: 40px 0 0 0;
+  width: 60%;
+  grid-column: span 1;
+  grid-row: span 1;
+  background-color: rgb(20, 24, 40, 0.8);
+}
+
+.purchase-analytics-widget {
+  height: 240px;
+  margin: 0 0 0 40px;
+  grid-column: span 1;
+  grid-row: span 1;
+  background-color: rgb(20, 24, 40, 0.8);
+}
+
+.revenueSelect {
+  width: 80px;
+  padding: 8px;
+  font-family: 'Oxanium', sans-serif;
+  font-size: 10px;
+  color: #FFFFFF;
+  background-color: #FF9800;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  appearance: none;
+  text-align: center;
+}
+
+.revenueSelect::-ms-expand {
+  display: none;
+}
+
+.revenueSelect:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(255, 152, 0, 0.5);
+}
+
+.revenueSelect:hover {
+  background-color: #E08900;
+}
+
+.revenueSelect option {
+  background-color: #FFFFFF;
+  color: #000000;
+}
+
+
+.app-usage-widget {
+  height: 240px;
+  grid-column: span 1;
+  grid-row: span 1;
+  background-color: rgb(20, 24, 40, 0.8);
+}
+
+#usageChart{
+  margin-top: 25px;
+}
+
+.digital-calendar-widget {
+  height: 65%;
+  margin: 0;
+  position: relative;
+  top: -75%;
+  width: 60%;
+  grid-column: span 1;
+  grid-row: span 1;
+  background-color: rgb(20, 24, 40, 0.8);
+}
+
+.items-widget {
+  grid-column: span 1;
+  grid-row: span 1;
+  position: relative;
+  top: -105%;
+  width: 60%;
+  height: 205px;
+  background-color: rgb(20, 24, 40, 0.8);
+}
+
+#mostPurchasedItems{
+  padding: 0px;
+}
+
+#mostPurchasedItems li {
+  display: flex;
+  padding: 5px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  font-size: 0.7em;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+#mostPurchasedItems li.rank-1 {
+  background-color: #af9500;
+}
+
+#mostPurchasedItems li.rank-2 {
+  background-color: #8f8f8f;
+}
+
+#mostPurchasedItems li.rank-3 {
+  background-color: #aa6118;
+}
+
+#mostPurchasedItems li.rank-4, #mostPurchasedItems li.rank-5 {
+  background-color: #ffffff00;
+}
+
+.rank-icon {
+  margin-right: 10px;
+  font-size: 0.8em;
+}
+
+.badge {
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: auto;
+  color: #000000;
+}
+
+#mostPurchasedItems li:hover {
+  transform: translateY(-3px);
+}
+
+/*greeting widget*/
+.greeting-content {
+  display: flex;
+}
+
+.greeting-text {
+  margin: 20px 15px;
+  height: 14em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.greeting-text h3 {
+  margin: 0;
+  font-size: 35px;
+  color: rgb(255, 255, 255);
+  font-weight: 700;
+}
+
+.greeting-text p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#logoutBtn {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  color: white;
+  font-family: 'Oxanium', sans-serif;
+  background-color: #ff8c00;
+  width: 8em;
+  cursor: pointer;
+}
+
+#logoutBtn:hover {
+  box-shadow: 0 0 10px #ff8c00;
+}
+
+.greeting-image img {
+  max-width: 100%;
+  height: 350px;
+  position: relative;
+  top: -20%;
+}
+
+/*clock widget*/
+.clock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.clock-display {
+  font-size: 2.5em;
+  color: #fff;
+  text-shadow: 0 0 5px black;
+}
+
+/*calendar widget*/
+.calendar {
+  text-align: center;
+  text-shadow: 0 0 5px black;
+}
+
+.calendar-title {
+  font-size: 18px;
+  margin: 0 0 10px 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.calendar-cell {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  background-color: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.empty-cell {
+  visibility: hidden;
+}
+
+.current-day {
+  background-color: #ff8c00;
+  font-weight: bold;
+}
+
+/*purchase-analytics-widget*/
+.chart-title {
+  font-size: 15px;
+  margin: 0 0 10px 0;
+}
+
+.chart-container {
+  height: 90%;
+}
+
+/*schedule-widget*/
+.schedule-title {
+  font-size: 1.1em;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+.schedule-list {
+  font-size: 0.9em;
+  list-style: none;
+  padding: 0;
+}
+
+.schedule-list li {
+  display: flex;
+  align-items: center;
+  margin: 0 0 5px 0;
+}
+
+.schedule-date {
+  background-color: #e67e22;
+  padding: 7px;
+  margin: 2px 5px;
+  border-radius: 5px;
+}
+
+.schedule-event {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.widget canvas {
+  width: 100% !important;
+  max-height: 400px;
+  background-color: rgba(20, 24, 40, 0.85); 
+  border-radius: 10px; 
+  padding: 20px;
+}
+
+/*end of widgets stylings*/
+/*end of home stylings*/
+
+
+
+/*start of stocks.html styling*/
+.stocks-section {
+  background-color: rgb(20, 24, 40, 0.5);
+  color: #fff;
+  height: 95vh;
+  width: 90%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 20px 120px;
+  box-shadow: 0px 0px 15px black;
+  border-radius: 15px;
+  z-index: 1;
+}
+
+.stocks-container {
+  display: flex;
+}
+
+.table-container {
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 25px;
+  font-size: 8px;
+}
+
+.stock-table {
+  width: 100%;
+  max-height: 50%;
+  border-collapse: collapse;
+  color: black;
+  font-size: 10px;
+  background-color: white;
+  border-radius: 5px;
+}
+
+.stock-table th{
+  background-color: #e67d22;
+  color: rgb(255, 255, 255);
+}
+
+.stock-table th,
+.stock-table td {
+  padding: 5px;
+  text-align: center;
+}
+
+.control-container {
+  font-size: 9px;
+  width: 40%;
+}
+
+.control {
+  background-color: rgba(0, 0, 40, 0.5);
+  margin: 25px 15px;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgb(0, 0, 0);
+}
+
+.control span{
+  font-size: 10px;
+  text-align: center;
+}
+
+.control button {
+  padding: 8px;
+  width: 18%;
+  background-color: #e67e22;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.control button:hover {
+  background-color: #ff8c00;
+  box-shadow: 0 0 10px #ff8c00;
+}
+
+.control input,
+select {
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 3px;
+  width: 80px;
+}
+
+.control label{
+  width: 40px;
+  display: inline-block
+}
+
+#prodImage,
+#updProdImage {
+  width: 110px;
+}
+
+#prodDescription,
+#updProdDescription {
+  width: 300px;
+}
+
+
+#toggle-icon {
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 25px;
+  position: relative;
+  z-index: 20;
+}
+
+#toggle-icon:hover{
+  opacity: 75%;
+}
+
+.popup-background {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10;
+}
+
+.popup-window {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+
+.popup-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  cursor: grab;
+  transition: transform 0.3s ease;
+}
+
+/*start of map.html styling*/
+.map-section {
+  background-color: rgb(20, 24, 40, 0.5);
+  color: #fff;
+  height: 95vh;
+  width: 90%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 20px 120px;
+  box-shadow: 0px 0px 15px black;
+  border-radius: 15px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.file-upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(0, 0, 40, 0.5);
+  margin: 25px;
+  padding: 40px;
+  border-radius: 10px;
+}
+
+.file-input {
+  display: none;
+}
+
+.custom-file-input {
+  display: inline-block;
+  padding: 15px;
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  width: 150px;
+  box-sizing: border-box;
+}
+
+.custom-file-input:hover {
+  background-color: #0056b3;
+}
+
+.file-upload-section button {
+  padding: 8px;
+  width: 75%;
+  background-color: #e67e22;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.file-upload-section button:hover {
+  background-color: #ff8c00;
+  box-shadow: 0 0 10px #ff8c00;
+}
+
+#uploadedMapText, #uploadedImgText, #existingMapText, #existingImgText{
+  font-size: 10px;
+}
